@@ -1,0 +1,525 @@
+{
+  "name": "Invoice Processing",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1zCLf4c1-LkoqSkchseMw6KNS9OTy08Il",
+          "mode": "list",
+          "cachedResultName": "InvoiceDemo",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1zCLf4c1-LkoqSkchseMw6KNS9OTy08Il"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "09050c61-37e4-4970-82b4-99362c159212",
+      "name": "Google Drive Trigger",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "Suu10WZu5c7ECdR0",
+          "name": "aranplayz687@gmail.com"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        208,
+        0
+      ],
+      "id": "024415d5-3daf-4227-936b-6aca762b50b6",
+      "name": "Download file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "Suu10WZu5c7ECdR0",
+          "name": "aranplayz687@gmail.com"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        416,
+        0
+      ],
+      "id": "81373248-8a91-4dfb-b72e-8a41f2445b28",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "text": "={{ $json.text }}",
+        "attributes": {
+          "attributes": [
+            {
+              "name": "Invoice Number",
+              "description": "Number of invoice",
+              "required": true
+            },
+            {
+              "name": "Bill To",
+              "description": "Name of person to whom the invoice is for",
+              "required": true
+            },
+            {
+              "name": "Balance",
+              "description": "Total balance on the invoice",
+              "required": true
+            },
+            {
+              "name": "Ship To",
+              "description": "Address on the invoice",
+              "required": true
+            },
+            {
+              "name": "Date",
+              "type": "date",
+              "description": "Date of the invoice"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "typeVersion": 1.2,
+      "position": [
+        624,
+        0
+      ],
+      "id": "eace32fd-d73f-4d41-aba8-48c9f2359c25",
+      "name": "Information Extractor"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        560,
+        208
+      ],
+      "id": "13e78339-4d26-4841-be2d-a37635978d67",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "Gu8LXMblgSFvkgDY",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1coh65Rne1y9MEOxbuaavKD1VJNWe5vYbu0uomsTF2BE",
+          "mode": "list",
+          "cachedResultName": "InvoiceDemo",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1coh65Rne1y9MEOxbuaavKD1VJNWe5vYbu0uomsTF2BE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1coh65Rne1y9MEOxbuaavKD1VJNWe5vYbu0uomsTF2BE/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Invoice Number": "={{ $json.output['Invoice Number'] }}",
+            "Bill To": "={{ $json.output['Bill To'] }}",
+            "Balance": "={{ $json.output.Balance }}",
+            "Ship To": "={{ $json.output['Ship To'] }}",
+            "Date": "={{ $json.output.Date }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Invoice Number",
+              "displayName": "Invoice Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Bill To",
+              "displayName": "Bill To",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Balance",
+              "displayName": "Balance",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Ship To",
+              "displayName": "Ship To",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        976,
+        0
+      ],
+      "id": "a1253f41-a7e3-434e-85e8-b9bd25e22d10",
+      "name": "Update DB",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "dy72ERPSmONtqu24",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Invoice no  {{ $json['Invoice Number'] }}\n\nBill To {{ $json['Bill To'] }}\n\n\nTotal balance {{ $json.Balance }}\n\nShip To {{ $json['Ship To'] }}\n\nDate {{ $json.Date }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=You are an email expert for Green Grass Corp named Greenle. You will receive invoice information. Your job is to notify the internal billing team that an invoice was received/sent.\n\n##Output \noutput the following parameters separately\n\nSubject\nemail"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        1184,
+        0
+      ],
+      "id": "31a6c2ee-dbbb-455f-bde4-b728bbe9ef9d",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1184,
+        256
+      ],
+      "id": "59e36a58-66cd-45a5-8d6b-c9ade53a8239",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "Gu8LXMblgSFvkgDY",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n\t\"Subject\": \"string\",\n  \"Email\": \"string\"\n\t\n}",
+        "autoFix": true
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        1360,
+        208
+      ],
+      "id": "f5f12e30-3b86-4e5c-9b7a-ea4266d69ed3",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "model": "tngtech/deepseek-r1t2-chimera:free",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        1328,
+        352
+      ],
+      "id": "80783798-86c7-49f6-bba5-f1ae1fb28dd4",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "hdsJFOe6GtM6D3mr",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "shahanali687@gmail.com",
+        "subject": "={{ $json.output.Subject }}",
+        "emailType": "text",
+        "message": "={{ $json.output.email }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1536,
+        0
+      ],
+      "id": "7308f48d-542c-4963-b882-1d80cd6421d3",
+      "name": "Send a message",
+      "webhookId": "6cc86b6b-f221-4d62-a95b-0957ab0ef857",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "END7drOLzS3vLHbU",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "Trigger on new file\n",
+        "height": 272,
+        "width": 432
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -80,
+        -80
+      ],
+      "typeVersion": 1,
+      "id": "0d9f7dcc-343c-4015-b704-2e37cd4b206f",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "Extract Information",
+        "height": 448,
+        "width": 512,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        384,
+        -80
+      ],
+      "typeVersion": 1,
+      "id": "32df881a-b1d2-4f16-a569-2efecdea22e6",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "Update Database\n",
+        "height": 208,
+        "width": 192,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        928,
+        -48
+      ],
+      "typeVersion": 1,
+      "id": "0f206752-fd7d-4ff3-9754-8539a7db2c86",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "Notify the team",
+        "height": 592,
+        "width": 576,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1152,
+        -112
+      ],
+      "typeVersion": 1,
+      "id": "759355b5-aafb-4afe-a831-796aedfee610",
+      "name": "Sticky Note3"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Drive Trigger": {
+      "main": [
+        [
+          {
+            "node": "Download file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download file": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Information Extractor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Information Extractor",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Information Extractor": {
+      "main": [
+        [
+          {
+            "node": "Update DB",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update DB": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Structured Output Parser",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "c3f8deb3-484a-412d-bf03-f96063a5fac1",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "558d88703fb65b2d0e44613bc35916258b0f0bf983c5d4730c00c424b77ca36a"
+  },
+  "id": "yWHuOPc47sbJRyb8",
+  "tags": []
+}
